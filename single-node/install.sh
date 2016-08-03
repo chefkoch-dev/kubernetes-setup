@@ -3,10 +3,11 @@
 MASTER_IP=$1
 RETRIES=${2:-500}
 
-if [ -z "MASTER_IP" ]; then
-    echo "ERROR: No IP given"
-    echo "Usage":
+if [ -z "${MASTER_IP}" ]; then
+    echo "ERROR: No IP parameter given"
+    echo "Usage:"
     echo "bash $0 <master_ip>"
+    exit 1
 fi
 
 function command-wait {
@@ -74,4 +75,4 @@ sudo systemctl enable kubelet
 sudo systemctl status kubelet
 
 echo ">> Waiting for Kubernetes to be ready"
-command-wait "kubectl cluster-info"
+command-wait "kubectl cluster-info" ${RETRIES}

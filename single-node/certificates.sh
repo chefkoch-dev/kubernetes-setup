@@ -9,6 +9,13 @@ MASTER_HOST=$1
 WORKERS=""
 K8S_SERVICE_IP="10.3.0.1"
 
+if [ -z "${MASTER_HOST}" ]; then
+    echo "ERROR: No MASTER_HOST parameter given"
+    echo "Usage:"
+    echo "bash $0 <master_host>"
+    exit 1
+fi
+
 #Create a Cluster Root CA
 openssl genrsa -out ca-key.pem 2048
 openssl req -x509 -new -nodes -key ca-key.pem -days 10000 -out ca.pem -subj "/CN=kube-ca"
