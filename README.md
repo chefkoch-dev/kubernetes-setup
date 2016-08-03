@@ -5,6 +5,8 @@
 Howto for setting up a single-node Kubernetes (v.1.3.2) on a CoreOS machine.
 All steps should be executed with the default `core` user with sudo permissions.
 
+This setup is only for dev or test purposes. Don't use this in production as the Kubernetes API will be publicy available.
+
 Requirements for this setup:
 
 * CoreOS >= 773.1.0
@@ -72,3 +74,4 @@ For the lazy ones all steps combined in an installer
 * [Cluster TLS using OpenSSL](https://coreos.com/kubernetes/docs/latest/openssl.html)
 * [Introducing the Kubernetes kubelet in CoreOS Linux](https://coreos.com/blog/introducing-the-kubelet-in-coreos/)
 * [Deploy Kubernetes Master Node(s)](https://coreos.com/kubernetes/docs/latest/deploy-master.html)
+* [Kubernetes Reference Documentation](http://kubernetes.io/docs/admin/kube-apiserver/)

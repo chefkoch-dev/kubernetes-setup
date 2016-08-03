@@ -68,6 +68,10 @@ echo ">> Downloading kubectl"
 sudo wget -O /opt/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.3.2/bin/linux/amd64/kubectl
 sudo chmod +x /opt/bin/kubectl
 
+kubectl config set-cluster default-cluster --server=http://${MASTER_IP}:8080
+kubectl config set-context default-system --cluster=default-cluster
+kubectl config use-context default-system
+
 echo ">> Starting Kubernetes"
 sudo systemctl daemon-reload
 sudo systemctl start kubelet
