@@ -63,10 +63,18 @@ Check if everything works correctly
     
 For the lazy ones all steps combined in an installer
 
+    # Step 1
     wget https://raw.githubusercontent.com/chefkoch-dev/kubernetes-setup/master/single-node/install.sh
     # for the paranoid ones: check contents of this script
     # cat install.sh
+    
+    # Step 2.1
+    # execute as root
     bash ./install.sh
+    
+    # Step 2.2
+    # execute as non-root
+    export SUDO=1; bash ./install.sh
 
 ## Further Documentation
 
