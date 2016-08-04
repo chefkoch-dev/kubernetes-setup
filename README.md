@@ -1,5 +1,7 @@
 # Kubernetes Setup
 
+Disclaimer: The installation script is a moving target. Path and workflow may change in near future. 
+
 ## CoreOS
 
 ### Single-Node Setup
