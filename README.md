@@ -1,6 +1,8 @@
 # Kubernetes Setup
 
-## Single-Node Setup
+## CoreOS
+
+### Single-Node Setup
 
 Howto for setting up a single-node Kubernetes (v.1.3.2) on a CoreOS machine.
 All steps should be executed with the default `core` user with sudo permissions.
@@ -20,7 +22,7 @@ Initial setup
     
 Creating the self-signed certificates
 
-    wget https://raw.githubusercontent.com/chefkoch-dev/kubernetes-setup/master/single-node/certificates.sh    
+    wget https://raw.githubusercontent.com/chefkoch-dev/kubernetes-setup/master/coreos/single-node/certificates.sh    
     bash ./certificates.sh <public ip of your machine>
     
     sudo cp ca.pem /etc/kubernetes/ssl/
@@ -31,12 +33,12 @@ Creating the self-signed certificates
     
 Defining the kubelet service (with `privileged` mode enabled)
 
-    wget https://raw.githubusercontent.com/chefkoch-dev/kubernetes-setup/master/single-node/services/kubelet.service
+    wget https://raw.githubusercontent.com/chefkoch-dev/kubernetes-setup/master/coreos/single-node/services/kubelet.service
     sudo cp kubelet.service /etc/systemd/system/kubelet.service
     
 Preparing the Kubernetes manifest
 
-    wget https://raw.githubusercontent.com/chefkoch-dev/kubernetes-setup/master/single-node/manifests/kubernetes.yaml
+    wget https://raw.githubusercontent.com/chefkoch-dev/kubernetes-setup/master/coreos/single-node/manifests/kubernetes.yaml
     
     sed -i "s@{{ADVERTISE_IP}}@<public ip of your machine>@" kubernetes.yaml
     
@@ -64,7 +66,7 @@ Check if everything works correctly
 For the lazy ones all steps combined in an installer
 
     # Step 1
-    wget https://raw.githubusercontent.com/chefkoch-dev/kubernetes-setup/master/single-node/install.sh
+    wget https://raw.githubusercontent.com/chefkoch-dev/kubernetes-setup/master/coreos/single-node/install.sh
     # for the paranoid ones: check contents of this script
     # cat install.sh
     

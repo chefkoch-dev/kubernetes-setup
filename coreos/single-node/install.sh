@@ -49,7 +49,7 @@ echo ">> Preparing folders"
 $SUDO mkdir -p /etc/kubernetes/ssl /opt/bin /etc/kubernetes/manifests/
 
 echo ">> Creating certificates"
-wget https://raw.githubusercontent.com/chefkoch-dev/kubernetes-setup/master/single-node/certificates.sh
+wget https://raw.githubusercontent.com/chefkoch-dev/kubernetes-setup/master/coreos/single-node/certificates.sh
 bash ./certificates.sh "${MASTER_IP}"
 
 echo ">> Installing certificates"
@@ -60,11 +60,11 @@ $SUDO chmod 600 /etc/kubernetes/ssl/*-key.pem
 $SUDO chown root:root /etc/kubernetes/ssl/*-key.pem
 
 echo ">> Preparing kubelet.service"
-wget https://raw.githubusercontent.com/chefkoch-dev/kubernetes-setup/master/single-node/services/kubelet.service
+wget https://raw.githubusercontent.com/chefkoch-dev/kubernetes-setup/master/coreos/single-node/services/kubelet.service
 $SUDO cp kubelet.service /etc/systemd/system/kubelet.service
 
 echo ">> Preparing Kubernetes manifest"
-wget https://raw.githubusercontent.com/chefkoch-dev/kubernetes-setup/master/single-node/manifests/kubernetes.yaml
+wget https://raw.githubusercontent.com/chefkoch-dev/kubernetes-setup/master/coreos/single-node/manifests/kubernetes.yaml
 
 sed -i "s@{{ADVERTISE_IP}}@${MASTER_IP}@" kubernetes.yaml
 
