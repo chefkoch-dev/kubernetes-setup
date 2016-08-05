@@ -46,7 +46,7 @@ function command-wait {
 }
 
 echo ">> Preparing folders"
-$SUDO mkdir -p /etc/kubernetes/ssl /opt/bin /etc/kubernetes/manifests/
+$SUDO mkdir -p /etc/kubernetes/ssl /opt/bin /etc/kubernetes/manifests /etc/kubernetes/addons
 
 echo ">> Creating certificates"
 wget https://raw.githubusercontent.com/chefkoch-dev/kubernetes-setup/master/coreos/single-node/certificates.sh
@@ -80,6 +80,8 @@ export KUBECONFIG=/tmp/kubeconfig
 /opt/bin/kubectl config set-context default-system --cluster=default-cluster
 /opt/bin/kubectl config use-context default-system
 
+
+
 echo ">> Starting Kubernetes"
 $SUDO systemctl daemon-reload
 $SUDO systemctl start kubelet
@@ -88,3 +90,11 @@ $SUDO systemctl status kubelet
 
 echo ">> Waiting for Kubernetes to be ready"
 command-wait "/opt/bin/kubectl cluster-info" ${RETRIES}
+
+# kubernetes master is ready, now we are ready for installing addons
+files=("dashboard-controller.yaml" "dashboard-np.yaml" "dashboard-service.yaml" "skydns-rc.yaml" "skydns-svc.yaml")
+for i in ${files[@]}
+do
+  $SUDO wget -O /etc/kubernetes/addons/${i} https://raw.githubusercontent.com/chefkoch-dev/kubernetes-setup/master/coreos/single-node/addons/${i}
+  /opt/bin/kubectl create -f /etc/kubernetes/addons/${i}
+done
