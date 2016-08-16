@@ -9,6 +9,7 @@ ExecStart=/usr/bin/kubelet \
   --allow-privileged=true \
   --config=/etc/kubernetes/manifests \
   --cluster-dns=10.3.0.254 \
+  --cluster-domain=cluster.local \
   --v=2
 Restart=on-failure
 RestartSec=5
