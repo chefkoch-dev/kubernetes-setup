@@ -16,12 +16,6 @@ if [ -z "${MASTER_HOST}" ]; then
     exit 1
 fi
 
-#Create a Cluster Root CA
-openssl genrsa -out ca-key.pem 2048
-openssl req -x509 -new -nodes -key ca-key.pem -days 10000 -out ca.pem -subj "/CN=kube-ca"
-chmod 0600 ca-key.pem
-
-
 if [ ! -f openssl.cnf ]; then
     cat >openssl.cnf <<EOF
 [req]
@@ -41,6 +35,11 @@ IP.1 = ${K8S_SERVICE_IP}
 IP.2 = ${MASTER_HOST}
 EOF
 fi
+
+#Create a Cluster Root CA
+openssl genrsa -out ca-key.pem 2048
+openssl req -x509 -new -nodes -key ca-key.pem -days 10000 -out ca.pem -subj "/CN=kube-ca"
+chmod 0600 ca-key.pem
 
 if [ ! -f apiserver-key.pem ]; then
     openssl genrsa -out apiserver-key.pem 2048

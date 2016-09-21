@@ -50,7 +50,7 @@ $SUDO mkdir -p /etc/kubernetes/ssl /opt/bin /etc/kubernetes/manifests /etc/kuber
 
 if [ ! -f "/etc/kubernetes/ssl/ca.pem" ]; then
     echo ">> Creating certificates"
-    wget https://raw.githubusercontent.com/chefkoch-dev/kubernetes-setup/master/coreos/single-node/certificates.sh
+    wget https://raw.githubusercontent.com/chefkoch-dev/kubernetes-setup/kubelet_fix/coreos/single-node/certificates.sh
     bash ./certificates.sh "${MASTER_IP}"
 
     echo ">> Installing certificates"
@@ -63,9 +63,17 @@ else
     echo ">> Skipping certificates"
 fi
 
+if [ ! -f "/opt/bin/kubelet" ]; then
+    echo ">> Downloading kubelet"
+    $SUDO wget -O /opt/bin/kubelet https://storage.googleapis.com/kubernetes-release/release/v1.3.2/bin/linux/amd64/kubelet
+    $SUDO chmod +x /opt/bin/kubelet
+else
+    echo ">> Skipping kubectl"
+fi
+
 if [ ! -f "/etc/systemd/system/kubelet.service" ]; then
     echo ">> Preparing kubelet.service"
-    wget https://raw.githubusercontent.com/chefkoch-dev/kubernetes-setup/master/coreos/single-node/services/kubelet.service
+    wget https://raw.githubusercontent.com/chefkoch-dev/kubernetes-setup/kubelet_fix/coreos/single-node/services/kubelet.service
     $SUDO cp kubelet.service /etc/systemd/system/kubelet.service
 else
     echo ">> Skipping kubelet.service"
@@ -73,7 +81,7 @@ fi
 
 if [ ! -f "/etc/kubernetes/manifests/kubernetes.yaml" ]; then
     echo ">> Preparing Kubernetes manifest"
-    wget https://raw.githubusercontent.com/chefkoch-dev/kubernetes-setup/master/coreos/single-node/manifests/kubernetes.yaml
+    wget https://raw.githubusercontent.com/chefkoch-dev/kubernetes-setup/kubelet_fix/coreos/single-node/manifests/kubernetes.yaml
 
     sed -i "s@{{ADVERTISE_IP}}@${MASTER_IP}@" kubernetes.yaml
 
