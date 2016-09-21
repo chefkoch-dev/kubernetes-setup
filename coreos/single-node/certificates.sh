@@ -5,7 +5,7 @@
 # * https://coreos.com/kubernetes/docs/latest/openssl.html
 #
 
-MASTER_HOST=$1
+MASTER_HOST="$1"
 WORKERS=""
 K8S_SERVICE_IP="10.3.0.1"
 
@@ -20,7 +20,7 @@ if [ ! -f openssl.cnf ]; then
     cat >openssl.cnf <<EOF
 [req]
 req_extensions = v3_req
-distinguished_name = req_distinguished_name
+distinguished_name = req_distinguished_nameca
 [req_distinguished_name]
 [ v3_req ]
 basicConstraints = CA:FALSE
@@ -38,7 +38,7 @@ fi
 
 #Create a Cluster Root CA
 openssl genrsa -out ca-key.pem 2048
-openssl req -x509 -new -nodes -key ca-key.pem -days 10000 -out ca.pem -subj "/CN=kube-ca"
+openssl req -x509 -new -nodes -key ca-key.pem -days 10000 -out ca.pem -subj "/CN=kube-ca" -config openssl.cnf
 chmod 0600 ca-key.pem
 
 if [ ! -f apiserver-key.pem ]; then
