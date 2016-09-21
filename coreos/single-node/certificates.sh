@@ -5,7 +5,7 @@
 # * https://coreos.com/kubernetes/docs/latest/openssl.html
 #
 
-MASTER_HOST=$1
+MASTER_HOST="$1"
 WORKERS=""
 K8S_SERVICE_IP="10.3.0.1"
 
@@ -15,12 +15,6 @@ if [ -z "${MASTER_HOST}" ]; then
     echo "bash $0 <master_host>"
     exit 1
 fi
-
-#Create a Cluster Root CA
-openssl genrsa -out ca-key.pem 2048
-openssl req -x509 -new -nodes -key ca-key.pem -days 10000 -out ca.pem -subj "/CN=kube-ca"
-chmod 0600 ca-key.pem
-
 
 if [ ! -f openssl.cnf ]; then
     cat >openssl.cnf <<EOF
@@ -37,10 +31,15 @@ DNS.1 = kubernetes
 DNS.2 = kubernetes.default
 DNS.3 = kubernetes.default.svc
 DNS.4 = kubernetes.default.svc.cluster.local
-IP.1 = ${K8S_SERVICE_IP}
-IP.2 = ${MASTER_HOST}
+IP.1 = $K8S_SERVICE_IP
+IP.2 = $MASTER_HOST
 EOF
 fi
+
+#Create a Cluster Root CA
+openssl genrsa -out ca-key.pem 2048
+openssl req -x509 -new -nodes -key ca-key.pem -days 10000 -out ca.pem -subj "/CN=kube-ca" -config openssl.cnf
+chmod 0600 ca-key.pem
 
 if [ ! -f apiserver-key.pem ]; then
     openssl genrsa -out apiserver-key.pem 2048
