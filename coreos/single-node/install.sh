@@ -65,7 +65,7 @@ fi
 
 if [ ! -f "/opt/bin/kubelet" ]; then
     echo ">> Downloading kubelet"
-    $SUDO wget -O /opt/bin/kubelet https://storage.googleapis.com/kubernetes-release/release/v1.3.2/bin/linux/amd64/kubelet
+    $SUDO wget -O /opt/bin/kubelet https://storage.googleapis.com/kubernetes-release/release/v1.4.6/bin/linux/amd64/kubelet
     $SUDO chmod +x /opt/bin/kubelet
 else
     echo ">> Skipping kubectl"
@@ -92,7 +92,7 @@ fi
 
 if [ ! -f "/opt/bin/kubectl" ]; then
     echo ">> Downloading kubectl"
-    $SUDO wget -O /opt/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.3.2/bin/linux/amd64/kubectl
+    $SUDO wget -O /opt/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.4.6/bin/linux/amd64/kubectl
     $SUDO chmod +x /opt/bin/kubectl
 else
     echo ">> Skipping kubectl"
