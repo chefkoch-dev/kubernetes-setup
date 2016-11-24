@@ -14,7 +14,7 @@ spec:
     name: ssl-certs-host
   containers:
   - name: kube-apiserver
-    image: quay.io/coreos/hyperkube:v1.3.2_coreos.0
+    image: quay.io/coreos/hyperkube:v1.4.6_coreos.0
     command:
     - /hyperkube
     - apiserver
@@ -47,7 +47,7 @@ spec:
       name: ssl-certs-host
       readOnly: true
   - name: kube-controller-manager
-    image: quay.io/coreos/hyperkube:v1.3.2_coreos.0
+    image: quay.io/coreos/hyperkube:v1.4.6_coreos.0
     command:
     - /hyperkube
     - controller-manager
@@ -70,7 +70,7 @@ spec:
       name: ssl-certs-host
       readOnly: true
   - name: kube-proxy
-    image: quay.io/coreos/hyperkube:v1.3.2_coreos.0
+    image: quay.io/coreos/hyperkube:v1.4.6_coreos.0
     command:
     - /hyperkube
     - proxy
@@ -83,7 +83,7 @@ spec:
       name: ssl-certs-host
       readOnly: true
   - name: kube-scheduler
-    image: quay.io/coreos/hyperkube:v1.3.2_coreos.0
+    image: quay.io/coreos/hyperkube:v1.4.6_coreos.0
     command:
     - /hyperkube
     - scheduler

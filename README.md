@@ -6,7 +6,7 @@ Disclaimer: The installation script is a moving target. Path and workflow may ch
 
 ### Single-Node Setup
 
-Howto for setting up a single-node Kubernetes (v.1.3.2) on a CoreOS machine.
+Howto for setting up a single-node Kubernetes on a CoreOS machine.
 All steps should be executed with the default `core` user with sudo permissions.
 
 This setup is only for dev or test purposes. Don't use this in production as the Kubernetes API will be publicy available.
@@ -48,7 +48,7 @@ Preparing the Kubernetes manifest
     
 Install kubectl
 
-    sudo wget -O /opt/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.3.2/bin/linux/amd64/kubectl
+    sudo wget -O /opt/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/<release>/bin/linux/amd64/kubectl
     sudo chmod +x /opt/bin/kubectl
     
 Start Kubernetes
@@ -87,3 +87,4 @@ For the lazy ones all steps combined in an installer
 * [Introducing the Kubernetes kubelet in CoreOS Linux](https://coreos.com/blog/introducing-the-kubelet-in-coreos/)
 * [Deploy Kubernetes Master Node(s)](https://coreos.com/kubernetes/docs/latest/deploy-master.html)
 * [Kubernetes Reference Documentation](http://kubernetes.io/docs/admin/kube-apiserver/)
+* [Deploy the DNS Add-on](https://coreos.com/kubernetes/docs/latest/deploy-addons.html)
