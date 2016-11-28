@@ -1,13 +1,13 @@
 #!/bin/bash
 
-WORKDIR="$(dirname $0)"
+WORKDIR="$(pwd)"
 
 MASTER_IP=$1
 RETRIES=${2:-500}
 K8S="${3:-1.4.6}"
 HYPERKUBE_VERSION="${4:-v${K8S}_coreos.0}"
 
-K8S_DASHBOARD="1.4.2"
+K8S_DASHBOARD="v1.4.2"
 K8S_DNS="1.8"
 K8S_DNSMASQ="1.4"
 K8S_HEALTHZ="1.2"
@@ -58,7 +58,7 @@ function command-wait {
 if [ ! -f "/etc/kubernetes/ssl/ca.pem" ]; then
     echo ">> Creating certificates"
     mkdir -p /etc/kubernetes/ssl
-    cd /etc/kubernetes/ssl && ${WORKDIR}/certificates.sh "${MASTER_IP}"
+    cd /etc/kubernetes/ssl && bash ${WORKDIR}/certificates.sh "${MASTER_IP}"
     chmod 600 /etc/kubernetes/ssl/*-key.pem
     chown root:root /etc/kubernetes/ssl/*-key.pem
 else
@@ -73,10 +73,10 @@ if [ ! -f "/etc/kubernetes/manifests/kubernetes.yaml" ]; then
 
     sed -e "s@{{ADVERTISE_IP}}@${MASTER_IP}@" \
         -e "s@{{HYPERKUBE_VERSION}}@${HYPERKUBE_VERSION}@" \
-        -e "s@{{K8S_DASHBOARD)}}@${K8S_DASHBOARD}@" \
+        -e "s@{{K8S_DASHBOARD}}@${K8S_DASHBOARD}@" \
         -e "s@{{K8S_DNS}}@${K8S_DNS}@" \
         -e "s@{{K8S_DNSMASQ}}@${K8S_DNSMASQ}@" \
-        -e "s@{{K8S_HEALTHZ)}}@${K8S_HEALTHZ}@" \
+        -e "s@{{K8S_HEALTHZ}}@${K8S_HEALTHZ}@" \
         ${WORKDIR}/manifests/kubernetes.yaml > /etc/kubernetes/manifests/kubernetes.yaml
 else
     echo ">> Skipping Kubernetes manifest"
@@ -112,10 +112,10 @@ if [ ! -f "/etc/systemd/system/kubelet.service" ]; then
       -e "s@{{K8S}}@${K8S}@" \
       -e "s@{{ADVERTISE_IP}}@${MASTER_IP}@" \
       -e "s@{{HYPERKUBE_VERSION}}@${HYPERKUBE_VERSION}@" \
-      -e "s@{{K8S_DASHBOARD)}}@${K8S_DASHBOARD}@" \
+      -e "s@{{K8S_DASHBOARD}}@${K8S_DASHBOARD}@" \
       -e "s@{{K8S_DNS}}@${K8S_DNS}@" \
       -e "s@{{K8S_DNSMASQ}}@${K8S_DNSMASQ}@" \
-      -e "s@{{K8S_HEALTHZ)}}@${K8S_HEALTHZ}@" \
+      -e "s@{{K8S_HEALTHZ}}@${K8S_HEALTHZ}@" \
       ${WORKDIR}/services/kubelet.service > /etc/systemd/system/kubelet.service
 else
     echo ">> Skipping kubelet.service"
@@ -140,10 +140,10 @@ do
         sed \
           -e "s@{{ADVERTISE_IP}}@${MASTER_IP}@" \
           -e "s@{{HYPERKUBE_VERSION}}@${HYPERKUBE_VERSION}@" \
-          -e "s@{{K8S_DASHBOARD)}}@${K8S_DASHBOARD}@" \
+          -e "s@{{K8S_DASHBOARD}}@${K8S_DASHBOARD}@" \
           -e "s@{{K8S_DNS}}@${K8S_DNS}@" \
           -e "s@{{K8S_DNSMASQ}}@${K8S_DNSMASQ}@" \
-          -e "s@{{K8S_HEALTHZ)}}@${K8S_HEALTHZ}@" \
+          -e "s@{{K8S_HEALTHZ}}@${K8S_HEALTHZ}@" \
           ${WORKDIR}/addons/${i} > /etc/kubernetes/addons/${i} \
           && /opt/bin/kubectl create -f /etc/kubernetes/addons/${i}
     else
