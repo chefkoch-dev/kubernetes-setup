@@ -71,14 +71,14 @@ For the lazy ones all steps combined in an installer
     ```
     ~> wget https://github.com/chefkoch-dev/kubernetes-setup/archive/master.tar.gz -O /tmp/master.tar.gz
     ~> cd /tmp && tar xvf master.tar.gz
-    ~> cd kubernetes-setup-master && sudo ./install.sh $MASTER_IP
+    ~> cd kubernetes-setup-master 
     ```
     # for the paranoid ones: check contents of this script
     # cat install.sh
 
     # Step 2.1
     # execute as root
-    bash ./install.sh
+    bash ./install.sh $MASTER_IP
 
     # Step 2.2
     # execute as non-root
