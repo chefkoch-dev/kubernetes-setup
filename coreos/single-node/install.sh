@@ -1,7 +1,16 @@
 #!/bin/bash
 
+WORKDIR="$(pwd)"
+
 MASTER_IP=$1
 RETRIES=${2:-500}
+K8S="${3:-1.4.6}"
+HYPERKUBE_VERSION="${4:-v${K8S}_coreos.0}"
+
+K8S_DASHBOARD="v1.4.2"
+K8S_DNS="1.8"
+K8S_DNSMASQ="1.4"
+K8S_HEALTHZ="1.2"
 
 if [ -z "${MASTER_IP}" ]; then
     echo "ERROR: No IP parameter given"
@@ -45,55 +54,41 @@ function command-wait {
     return 1
 }
 
-echo ">> Preparing folders"
-$SUDO mkdir -p /etc/kubernetes/ssl /opt/bin /etc/kubernetes/manifests /etc/kubernetes/addons
-
+#create kubernetes certificates
 if [ ! -f "/etc/kubernetes/ssl/ca.pem" ]; then
     echo ">> Creating certificates"
-    wget https://raw.githubusercontent.com/chefkoch-dev/kubernetes-setup/master/coreos/single-node/certificates.sh
-    bash ./certificates.sh "${MASTER_IP}"
-
-    echo ">> Installing certificates"
-    $SUDO cp ca.pem /etc/kubernetes/ssl/
-    $SUDO cp apiserver.pem /etc/kubernetes/ssl/
-    $SUDO cp apiserver-key.pem /etc/kubernetes/ssl/
-    $SUDO chmod 600 /etc/kubernetes/ssl/*-key.pem
-    $SUDO chown root:root /etc/kubernetes/ssl/*-key.pem
+    mkdir -p /etc/kubernetes/ssl
+    cd /etc/kubernetes/ssl && bash ${WORKDIR}/certificates.sh "${MASTER_IP}"
+    chmod 600 /etc/kubernetes/ssl/*-key.pem
+    chown root:root /etc/kubernetes/ssl/*-key.pem
 else
     echo ">> Skipping certificates"
 fi
 
-if [ ! -f "/opt/bin/kubelet" ]; then
-    echo ">> Downloading kubelet"
-    $SUDO wget -O /opt/bin/kubelet https://storage.googleapis.com/kubernetes-release/release/v1.4.6/bin/linux/amd64/kubelet
-    $SUDO chmod +x /opt/bin/kubelet
-else
-    echo ">> Skipping kubectl"
-fi
-
-if [ ! -f "/etc/systemd/system/kubelet.service" ]; then
-    echo ">> Preparing kubelet.service"
-    wget https://raw.githubusercontent.com/chefkoch-dev/kubernetes-setup/master/coreos/single-node/services/kubelet.service
-    $SUDO cp kubelet.service /etc/systemd/system/kubelet.service
-else
-    echo ">> Skipping kubelet.service"
-fi
-
+# create kubernetes manifest
 if [ ! -f "/etc/kubernetes/manifests/kubernetes.yaml" ]; then
     echo ">> Preparing Kubernetes manifest"
-    wget https://raw.githubusercontent.com/chefkoch-dev/kubernetes-setup/master/coreos/single-node/manifests/kubernetes.yaml
 
-    sed -i "s@{{ADVERTISE_IP}}@${MASTER_IP}@" kubernetes.yaml
+    mkdir -p /etc/kubernetes/manifests
 
-    $SUDO cp kubernetes.yaml /etc/kubernetes/manifests/
+    sed -e "s@{{ADVERTISE_IP}}@${MASTER_IP}@" \
+        -e "s@{{HYPERKUBE_VERSION}}@${HYPERKUBE_VERSION}@" \
+        -e "s@{{K8S_DASHBOARD}}@${K8S_DASHBOARD}@" \
+        -e "s@{{K8S_DNS}}@${K8S_DNS}@" \
+        -e "s@{{K8S_DNSMASQ}}@${K8S_DNSMASQ}@" \
+        -e "s@{{K8S_HEALTHZ}}@${K8S_HEALTHZ}@" \
+        ${WORKDIR}/manifests/kubernetes.yaml > /etc/kubernetes/manifests/kubernetes.yaml
 else
     echo ">> Skipping Kubernetes manifest"
 fi
 
+
+# install kubectl
 if [ ! -f "/opt/bin/kubectl" ]; then
     echo ">> Downloading kubectl"
-    $SUDO wget -O /opt/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.4.6/bin/linux/amd64/kubectl
-    $SUDO chmod +x /opt/bin/kubectl
+    mkdir -p /opt/bin
+    wget -O /opt/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v${K8S}/bin/linux/amd64/kubectl
+    chmod +x /opt/bin/kubectl
 else
     echo ">> Skipping kubectl"
 fi
@@ -109,11 +104,28 @@ else
     echo ">> Skipping Kubernetes context"
 fi
 
+# install kubelet as systemd-unit
+if [ ! -f "/etc/systemd/system/kubelet.service" ]; then
+    echo ">> Preparing kubelet.service"
+
+    sed \
+      -e "s@{{K8S}}@${K8S}@" \
+      -e "s@{{ADVERTISE_IP}}@${MASTER_IP}@" \
+      -e "s@{{HYPERKUBE_VERSION}}@${HYPERKUBE_VERSION}@" \
+      -e "s@{{K8S_DASHBOARD}}@${K8S_DASHBOARD}@" \
+      -e "s@{{K8S_DNS}}@${K8S_DNS}@" \
+      -e "s@{{K8S_DNSMASQ}}@${K8S_DNSMASQ}@" \
+      -e "s@{{K8S_HEALTHZ}}@${K8S_HEALTHZ}@" \
+      ${WORKDIR}/services/kubelet.service > /etc/systemd/system/kubelet.service
+else
+    echo ">> Skipping kubelet.service"
+fi
+
 echo ">> Starting Kubernetes"
-$SUDO systemctl daemon-reload
-$SUDO systemctl start kubelet
-$SUDO systemctl enable kubelet
-$SUDO systemctl status kubelet
+systemctl daemon-reload
+systemctl start kubelet
+systemctl enable kubelet
+systemctl status kubelet
 
 echo ">> Waiting for Kubernetes to be ready"
 command-wait "/opt/bin/kubectl cluster-info" ${RETRIES}
@@ -123,9 +135,17 @@ files=("dashboard-controller.yaml" "dashboard-np.yaml" "dashboard-service.yaml" 
 for i in ${files[@]}
 do
     if [ ! -f "/etc/kubernetes/addons/${i}" ]; then
+        mkdir -p /etc/kubernetes/addons
         echo ">> Installing addon ${i}"
-        $SUDO wget -O /etc/kubernetes/addons/${i} https://raw.githubusercontent.com/chefkoch-dev/kubernetes-setup/master/coreos/single-node/addons/${i}
-        /opt/bin/kubectl create -f /etc/kubernetes/addons/${i}
+        sed \
+          -e "s@{{ADVERTISE_IP}}@${MASTER_IP}@" \
+          -e "s@{{HYPERKUBE_VERSION}}@${HYPERKUBE_VERSION}@" \
+          -e "s@{{K8S_DASHBOARD}}@${K8S_DASHBOARD}@" \
+          -e "s@{{K8S_DNS}}@${K8S_DNS}@" \
+          -e "s@{{K8S_DNSMASQ}}@${K8S_DNSMASQ}@" \
+          -e "s@{{K8S_HEALTHZ}}@${K8S_HEALTHZ}@" \
+          ${WORKDIR}/addons/${i} > /etc/kubernetes/addons/${i} \
+          && /opt/bin/kubectl create -f /etc/kubernetes/addons/${i}
     else
         #@TODO check if addon is really installed
         echo ">> Skipping addon ${i}"
