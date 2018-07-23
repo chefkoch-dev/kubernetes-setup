@@ -12,6 +12,7 @@ ExecStart=/opt/bin/kubelet \
   --config=/etc/kubernetes/manifests \
   --cluster-dns=10.3.0.254 \
   --cluster-domain=cluster.local \
+  --hostname-override={{ADVERTISE_IP}} \
   --v=2
 Restart=on-failure
 RestartSec=5
