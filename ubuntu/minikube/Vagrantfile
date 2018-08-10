@@ -1,0 +1,23 @@
+# -*- mode: ruby -*-
+# # vi: set ft=ruby :
+
+require 'fileutils'
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/xenial64"
+  config.vm.hostname = "demo"
+  config.ssh.insert_key = false
+  config.ssh.forward_agent = true
+
+  config.vm.provider :virtualbox do |v|
+    v.check_guest_additions = false
+    v.gui = false
+    v.memory = 2560
+    v.cpus = 2
+  end
+
+  config.vm.network :private_network, ip: "192.168.50.4"
+
+  config.vm.provision :shell, preserve_order: true, path: "provision.sh"
+  config.vm.provision :shell, preserve_order: true, path: "install.sh"
+end
