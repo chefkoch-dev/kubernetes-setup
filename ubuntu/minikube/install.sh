@@ -32,14 +32,3 @@ minikube addons enable dashboard
 # fix file permissions after minikube has created meta files
 chown ${target_user}:${target_user} -R /home/${target_user}/.kube
 chown ${target_user}:${target_user} -R /home/${target_user}/.minikube
-
-# stupid workaround for addons not starting properly
-# see e.g. https://github.com/kubernetes/minikube/issues/2619
-cd /etc/kubernetes/addons
-kubectl apply -f kube-dns-cm.yaml -f kube-dns-controller.yaml -f kube-dns-svc.yaml -f dashboard-dp.yaml -f dashboard-svc.yaml
-
-#@see https://github.com/kubernetes/kubernetes/issues/39823
-#@see https://github.com/kubernetes/kubernetes/issues/58908
-iptables -P FORWARD ACCEPT
-
-
