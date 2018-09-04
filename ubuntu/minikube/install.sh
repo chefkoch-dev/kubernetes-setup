@@ -19,7 +19,7 @@ touch /home/${target_user}/.kube/config
 
 minikube start \
     --kubernetes-version "${k8s_version}" \
-    --extra-config=apiserver.ServiceNodePortRange="${port_range}" \
+    --extra-config=apiserver.service-node-port-range="${port_range}" \
     --logtostderr --loglevel 0 \
     --vm-driver=none
 
